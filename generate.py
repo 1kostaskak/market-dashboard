@@ -66,6 +66,35 @@ TOP_N_SWINGS     = 8
 OUTPUT_HTML      = os.path.join(os.path.dirname(os.path.abspath(__file__)), "index.html")
 
 
+
+BLUE_CHIPS = {
+    "V":    {"name": "Visa",           "sector": "💳 Financial",  "target": 380.00},
+    "MA":   {"name": "Mastercard",     "sector": "💳 Financial",  "target": 560.00},
+    "JPM":  {"name": "JP Morgan",      "sector": "💳 Financial",  "target": 280.00},
+    "AXP":  {"name": "Amex",           "sector": "💳 Financial",  "target": 340.00},
+    "GS":   {"name": "Goldman Sachs",  "sector": "💳 Financial",  "target": 650.00},
+    "WMT":  {"name": "Walmart",        "sector": "🛒 Consumer",   "target": 115.00},
+    "COST": {"name": "Costco",         "sector": "🛒 Consumer",   "target": 1050.00},
+    "PG":   {"name": "Procter&Gamble", "sector": "🛒 Consumer",   "target": 185.00},
+    "KO":   {"name": "Coca-Cola",      "sector": "🛒 Consumer",   "target": 75.00},
+    "PEP":  {"name": "PepsiCo",        "sector": "🛒 Consumer",   "target": 175.00},
+    "JNJ":  {"name": "J&J",            "sector": "🏥 Healthcare", "target": 175.00},
+    "UNH":  {"name": "UnitedHealth",   "sector": "🏥 Healthcare", "target": 620.00},
+    "ABT":  {"name": "Abbott",         "sector": "🏥 Healthcare", "target": 145.00},
+    "LLY":  {"name": "Eli Lilly",      "sector": "🏥 Healthcare", "target": 1050.00},
+    "TMO":  {"name": "Thermo Fisher",  "sector": "🏥 Healthcare", "target": 620.00},
+    "CAT":  {"name": "Caterpillar",    "sector": "⚙️ Industrial", "target": 420.00},
+    "HON":  {"name": "Honeywell",      "sector": "⚙️ Industrial", "target": 240.00},
+    "DE":   {"name": "John Deere",     "sector": "⚙️ Industrial", "target": 480.00},
+    "RTX":  {"name": "RTX Corp",       "sector": "⚙️ Industrial", "target": 145.00},
+    "GE":   {"name": "GE Aerospace",   "sector": "⚙️ Industrial", "target": 220.00},
+    "CVX":  {"name": "Chevron",        "sector": "⛽ Energy",     "target": 185.00},
+    "SLB":  {"name": "Schlumberger",   "sector": "⛽ Energy",     "target": 58.00},
+    "LIN":  {"name": "Linde",          "sector": "🧪 Materials",  "target": 520.00},
+    "AMT":  {"name": "American Tower", "sector": "🏢 REIT",       "target": 230.00},
+    "NEE":  {"name": "NextEra Energy", "sector": "⚡ Utilities",  "target": 85.00},
+}
+
 def compute_rsi(series, period=14):
     delta = series.diff()
     gain  = delta.clip(lower=0).rolling(period).mean()
@@ -95,10 +124,30 @@ def fetch_data(ticker):
         chg   = round(((price - prev) / prev) * 100, 2)
         ma50  = round(float(close.rolling(50).mean().iloc[-1]),  2) if len(close) >= 50  else None
         ma200 = round(float(close.rolling(200).mean().iloc[-1]), 2) if len(close) >= 200 else None
-        rsi   = round(float(compute_rsi(close).iloc[-1]), 1)
+        rsi_series = compute_rsi(close)
+        rsi   = round(float(rsi_series.iloc[-1]), 1)
         avg_v = int(vol.rolling(20).mean().iloc[-1])
+
+        # Confirmation: consecutive days RSI < 45
+        rsi_days_oversold = 0
+        for i in range(1, min(10, len(rsi_series))):
+            if rsi_series.iloc[-i] < 45:
+                rsi_days_oversold += 1
+            else:
+                break
+
+        # Entry signal: oversold 3+ days AND today green
+        entry_signal = None
+        entry_price  = None
+        if rsi_days_oversold >= 3 and chg > 0 and rsi < 45:
+            entry_price  = round(price * 0.995, 2)
+            entry_signal = f"🎯 ΕΙΣΟΔΟΣ ~${entry_price} (RSI oversold {rsi_days_oversold} μέρες · +{chg:.2f}% σήμερα)"
+
         return {"price": price, "prev": prev, "chg": chg, "ma50": ma50, "ma200": ma200,
                 "rsi": rsi, "avg_vol": avg_v,
+                "rsi_days_oversold": rsi_days_oversold,
+                "entry_signal": entry_signal,
+                "entry_price": entry_price,
                 "arrow": "▲" if chg >= 0 else "▼",
                 "chg_color": "#2e7d32" if chg >= 0 else "#c62828"}
     except Exception:
@@ -155,7 +204,7 @@ def run_swing_scanner():
     return candidates[:TOP_N_SWINGS]
 
 
-def build_html(big7_r, pos_r, swings, date_str):
+def build_html(big7_r, pos_r, swings, bc_results, date_str):
     def row_big7(t, info, d):
         if not d: return f"<tr><td><b>{t}</b></td><td colspan='7'>❌</td></tr>"
         sig, bg = get_signal(d["rsi"], d["price"], d["ma50"], d["ma200"])
@@ -171,7 +220,7 @@ def build_html(big7_r, pos_r, swings, date_str):
           <td>{a50} / {a200}</td>
           <td><b>{d['rsi']}</b></td>
           <td style="color:{dc}"><b>{dist:+.1f}%</b><br><small>target ${info['target']}</small></td>
-          <td>{sig}</td></tr>"""
+          <td>{sig}{f"<br><small style='color:#1a73e8'>{d['entry_signal']}</small>" if d.get('entry_signal') else ""}</td></tr>"""
 
     big7_rows = "".join(row_big7(t, info, big7_r.get(t)) for t, info in BIG7.items())
 
@@ -188,7 +237,7 @@ def build_html(big7_r, pos_r, swings, date_str):
           <td>${gtlb_d['ma200'] or '—'}</td>
           <td><b>{gtlb_d['rsi']}</b></td>
           <td>${gi['target']}</td>
-          <td colspan="2"><b>{gsig}</b><br><small>Πώληση μόνο αν τιμή &gt; ${gi['hard_sell']}</small></td></tr>"""
+          <td colspan="2"><b>{gsig}</b><br><small>Πώληση μόνο αν τιμή &gt; ${gi['hard_sell']}</small>{f"<br><small style='color:#1a73e8'>{gtlb_d['entry_signal']}</small>" if gtlb_d.get('entry_signal') else ""}</td></tr>"""
     else:
         gtlb_row = "<tr><td colspan='8'>❌ GTLB</td></tr>"
 
@@ -204,7 +253,7 @@ def build_html(big7_r, pos_r, swings, date_str):
           <td>${xom_d['ma200'] or '—'}</td>
           <td><b>{xom_d['rsi']}</b></td>
           <td>${xi['target']}</td>
-          <td colspan="2"><b>{xsig}</b><br><small>{watch}</small></td></tr>"""
+          <td colspan="2"><b>{xsig}</b><br><small>{watch}</small>{f"<br><small style='color:#1a73e8'>{xom_d['entry_signal']}</small>" if xom_d.get('entry_signal') else ""}</td></tr>"""
     else:
         xom_row = "<tr><td colspan='8'>❌ XOM</td></tr>"
 
@@ -222,9 +271,37 @@ def build_html(big7_r, pos_r, swings, date_str):
               <td>${s['ma50'] or '—'}</td>
               <td>${s['ma200'] or '—'}</td>
               <td>{a200}</td>
-              <td style="color:{sc_col}"><b>{s['score']}/100</b></td></tr>"""
+              <td style="color:{sc_col}"><b>{s['score']}/100</b>{f"<br><small style='color:#1a73e8'>{s['entry_signal']}</small>" if s.get('entry_signal') else ""}</td></tr>"""
     else:
         swing_rows = "<tr><td colspan='8' style='padding:20px'>Δεν βρέθηκαν setups αυτή τη στιγμή</td></tr>"
+
+
+    # Blue Chip rows grouped by sector
+    bc_rows = ""
+    last_sector = ""
+    for t, info in BLUE_CHIPS.items():
+        d = bc_results.get(t)
+        if not d:
+            bc_rows += f"<tr><td><b>{t}</b></td><td colspan='7'>❌</td></tr>"
+            continue
+        sig, bg = get_signal(d["rsi"], d["price"], d["ma50"], d["ma200"])
+        dist = round(((info["target"] - d["price"]) / d["price"]) * 100, 1)
+        dc   = "#2e7d32" if dist > 0 else "#c62828"
+        a50  = "✅" if d["ma50"]  and d["price"] > d["ma50"]  else "❌"
+        a200 = "✅" if d["ma200"] and d["price"] > d["ma200"] else "❌"
+        if info["sector"] != last_sector:
+            bc_rows += f"<tr style=\"background:#e8eaf6\"><td colspan='8'><b>{info['sector']}</b></td></tr>"
+            last_sector = info["sector"]
+        entry_html = f"<br><small style=\"color:#1a73e8\">{d['entry_signal']}</small>" if d.get("entry_signal") else ""
+        bc_rows += f"""<tr style="background:{bg}">
+          <td><b>{t}</b><br><small style="color:#666">{info['name']}</small></td>
+          <td><b>${d['price']}</b><br><small style="color:{d['chg_color']}">{d['arrow']} {d['chg']:+.2f}%</small></td>
+          <td>${d['ma50'] or '—'}</td>
+          <td>${d['ma200'] or '—'}</td>
+          <td>{a50} / {a200}</td>
+          <td><b>{d['rsi']}</b></td>
+          <td style="color:{dc}"><b>{dist:+.1f}%</b><br><small>target ${info['target']}</small></td>
+          <td>{sig}{entry_html}</td></tr>"""
 
     return f"""<!DOCTYPE html>
 <html lang="el"><head><meta charset="UTF-8">
@@ -267,7 +344,12 @@ tr:last-child td {{border-bottom:none}}
   <table><thead><tr><th>Ticker</th><th>Τιμή</th><th>RSI Daily</th><th>RSI Weekly</th><th>MA50</th><th>MA200</th><th>Πάνω MA200</th><th>Score</th></tr></thead>
   <tbody>{swing_rows}</tbody></table>
 
-  <div class="legend">
+
+  <h2>💎 Blue Chips — Non-Tech S&P 500</h2>
+  <table><thead><tr><th>Μετοχή</th><th>Τιμή</th><th>MA50</th><th>MA200</th><th>MA50/200</th><th>RSI</th><th>↔ Target</th><th>Σήμα</th></tr></thead>
+  <tbody>{bc_rows}</tbody></table>
+
+    <div class="legend">
     <p>🟢 <b>BULLISH</b> — Πάνω από MA50 &amp; MA200 &nbsp;|&nbsp; 🟢 <b>OVERSOLD/BUY ZONE</b> — RSI &lt;35 &amp; πάνω από MA200</p>
     <p>🟡 <b>NEUTRAL</b> — Μικτά σήματα &nbsp;|&nbsp; 🔴 <b>BEARISH</b> — Κάτω από MA50 &amp; MA200 &nbsp;|&nbsp; 🔴 <b>OVERBOUGHT</b> — RSI &gt;70</p>
     <p style="margin-top:6px">📊 <b>Swing Score 0–100</b>: RSI daily (35pts) + RSI weekly (25pts) + πάνω MA200 (20pts) + MA50 (10pts) + volume (10pts)</p>
@@ -298,7 +380,15 @@ def main():
 
     swings = run_swing_scanner()
 
-    html = build_html(big7_r, pos_r, swings, date_str)
+    print("\n💎 Blue Chips...")
+    bc_results = {}
+    for t in BLUE_CHIPS:
+        print(f"  {t}...", end=" ", flush=True)
+        bc_results[t] = fetch_data(t)
+        d = bc_results[t]
+        print(f"${d['price']} RSI:{d['rsi']}" if d else "ΣΦΑΛΜΑ")
+
+    html = build_html(big7_r, pos_r, swings, bc_results, date_str)
     with open(OUTPUT_HTML, "w", encoding="utf-8") as f:
         f.write(html)
 
