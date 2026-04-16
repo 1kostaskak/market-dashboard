@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="el"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Market Dashboard</title>
+<style>
+* {box-sizing:border-box}
+body {font-family:'Segoe UI',Arial,sans-serif;margin:0;background:#f0f2f5}
+.hdr {background:#0d1b2a;color:white;padding:22px 28px}
+.hdr h1 {margin:0;font-size:1.4em}
+.hdr p {margin:4px 0 0;opacity:.65;font-size:.83em}
+.wrap {padding:18px 28px}
+h2 {color:#0d1b2a;border-left:4px solid #1a73e8;padding-left:10px;margin:24px 0 10px;font-size:.95em;text-transform:uppercase;letter-spacing:.5px}
+table {width:100%;border-collapse:collapse;background:white;border-radius:10px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.07);margin-bottom:6px}
+th {background:#1a237e;color:white;padding:9px 11px;text-align:center;font-size:.78em;text-transform:uppercase;letter-spacing:.4px}
+th:first-child {text-align:left}
+td {padding:9px 11px;border-bottom:1px solid #f0f0f0;font-size:.86em;vertical-align:middle;text-align:center}
+td:first-child {text-align:left}
+tr:last-child td {border-bottom:none}
+.note {background:#e8f0fe;border-left:4px solid #1a73e8;padding:9px 13px;border-radius:6px;font-size:.8em;color:#1a237e;margin-bottom:8px}
+.legend {background:white;border-radius:10px;padding:13px 17px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-top:6px}
+.legend p {margin:3px 0;font-size:.8em;color:#555}
+.footer {text-align:center;color:#aaa;font-size:.72em;margin-top:20px;padding-bottom:20px}
+</style></head><body>
+<div class="hdr">
+  <h1>📊 Market Dashboard — Big 7 · Θέσεις · Swing Scanner</h1>
+  <p>Ενημέρωση: 16 April 2026, 08:02 &nbsp;|&nbsp; Yahoo Finance &nbsp;|&nbsp; RSI-14</p>
+</div>
+<div class="wrap">
+  <h2>🔮 Big 7</h2>
+  <table><thead><tr><th>Μετοχή</th><th>Τιμή</th><th>MA50</th><th>MA200</th><th>MA50/200</th><th>RSI</th><th>↔ Target</th><th>Σήμα</th></tr></thead>
+  <tbody><tr style="background:#e8f5e9">
+          <td><b>AAPL</b><br><small style="color:#666">Apple</small></td>
+          <td><b>$266.43</b><br><small style="color:#2e7d32">▲ +2.94%</small></td>
+          <td>$260.79</td>
+          <td>$251.22</td>
+          <td>✅ / ✅</td>
+          <td><b>67.1</b></td>
+          <td style="color:#c62828"><b>-11.4%</b><br><small>target $236.0</small></td>
+          <td>🟢 BULLISH</td></tr><tr style="background:#ffebee">
+          <td><b>MSFT</b><br><small style="color:#666">Microsoft</small></td>
+          <td><b>$411.22</b><br><small style="color:#2e7d32">▲ +4.61%</small></td>
+          <td>$391.71</td>
+          <td>$471.15</td>
+          <td>✅ / ❌</td>
+          <td><b>75.2</b></td>
+          <td style="color:#2e7d32"><b>+20.9%</b><br><small>target $497.0</small></td>
+          <td>🔴 OVERBOUGHT</td></tr><tr style="background:#ffebee">
+          <td><b>GOOGL</b><br><small style="color:#666">Alphabet</small></td>
+          <td><b>$337.12</b><br><small style="color:#2e7d32">▲ +1.26%</small></td>
+          <td>$307.67</td>
+          <td>$270.6</td>
+          <td>✅ / ✅</td>
+          <td><b>76.6</b></td>
+          <td style="color:#c62828"><b>-38.6%</b><br><small>target $207.0</small></td>
+          <td>🔴 OVERBOUGHT</td></tr><tr style="background:#ffebee">
+          <td><b>AMZN</b><br><small style="color:#666">Amazon</small></td>
+          <td><b>$248.5</b><br><small style="color:#c62828">▼ -0.21%</small></td>
+          <td>$213.67</td>
+          <td>$225.28</td>
+          <td>✅ / ✅</td>
+          <td><b>78.7</b></td>
+          <td style="color:#c62828"><b>-1.4%</b><br><small>target $245.0</small></td>
+          <td>🔴 OVERBOUGHT</td></tr><tr style="background:#fffde7">
+          <td><b>META</b><br><small style="color:#666">Meta</small></td>
+          <td><b>$671.58</b><br><small style="color:#2e7d32">▲ +1.37%</small></td>
+          <td>$629.44</td>
+          <td>$680.7</td>
+          <td>✅ / ❌</td>
+          <td><b>66.9</b></td>
+          <td style="color:#2e7d32"><b>+0.5%</b><br><small>target $675.0</small></td>
+          <td>🟡 NEUTRAL</td></tr><tr style="background:#ffebee">
+          <td><b>NVDA</b><br><small style="color:#666">NVIDIA</small></td>
+          <td><b>$198.87</b><br><small style="color:#2e7d32">▲ +1.20%</small></td>
+          <td>$182.38</td>
+          <td>$181.31</td>
+          <td>✅ / ✅</td>
+          <td><b>71.4</b></td>
+          <td style="color:#c62828"><b>-18.0%</b><br><small>target $163.0</small></td>
+          <td>🔴 OVERBOUGHT</td></tr><tr style="background:#fffde7">
+          <td><b>TSLA</b><br><small style="color:#666">Tesla</small></td>
+          <td><b>$391.95</b><br><small style="color:#2e7d32">▲ +7.62%</small></td>
+          <td>$391.1</td>
+          <td>$398.01</td>
+          <td>✅ / ❌</td>
+          <td><b>52.1</b></td>
+          <td style="color:#c62828"><b>-18.4%</b><br><small>target $320.0</small></td>
+          <td>🟡 NEUTRAL</td></tr></tbody></table>
+
+  <h2>🦊 Θέσεις μου — GTLB & XOM</h2>
+  <table><thead><tr><th>Μετοχή</th><th>Τιμή</th><th>MA50</th><th>MA200</th><th>RSI</th><th>Target</th><th colspan="2">Σήμα</th></tr></thead>
+  <tbody><tr style="background:#ffebee">
+          <td><b>GTLB</b><br><small>GitLab</small></td>
+          <td><b>$21.76</b><br><small style="color:#2e7d32">▲ +8.37%</small></td>
+          <td>$24.82</td>
+          <td>$38.69</td>
+          <td><b>55.3</b></td>
+          <td>$41.67</td>
+          <td colspan="2"><b>🔴 SELL — Stop Loss</b><br><small>Πώληση μόνο αν τιμή &gt; $24.0</small></td></tr><tr style="background:#e8f5e9">
+          <td><b>XOM</b><br><small>Exxon</small></td>
+          <td><b>$149.01</b><br><small style="color:#c62828">▼ -0.15%</small></td>
+          <td>$154.43</td>
+          <td>$124.31</td>
+          <td><b>30.9</b></td>
+          <td>$120.0</td>
+          <td colspan="2"><b>🟢 OVERSOLD/BUY ZONE</b><br><small>⚠️ Κάτω από $160!</small></td></tr></tbody></table>
+
+  <h2>🚀 Swing Scanner — Ευκαιρίες &lt;$100</h2>
+  <div class="note">📋 Κριτήρια: Τιμή &lt;$100 · Volume &gt;1M · RSI daily &lt;40 ή weekly &lt;45 · Score βάσει RSI+MA+Volume</div>
+  <table><thead><tr><th>Ticker</th><th>Τιμή</th><th>RSI Daily</th><th>RSI Weekly</th><th>MA50</th><th>MA200</th><th>Πάνω MA200</th><th>Score</th></tr></thead>
+  <tbody><tr>
+              <td><b>APTV</b></td>
+              <td><b>$58.46</b></td>
+              <td>23.2</td>
+              <td>19.2</td>
+              <td>$72.1</td>
+              <td>$76.67</td>
+              <td>❌</td>
+              <td style="color:#f57f17"><b>65/100</b></td></tr><tr>
+              <td><b>KMI</b></td>
+              <td><b>$31.7</b></td>
+              <td>16.7</td>
+              <td>72.0</td>
+              <td>$32.73</td>
+              <td>$28.35</td>
+              <td>✅</td>
+              <td style="color:#f57f17"><b>65/100</b></td></tr><tr>
+              <td><b>VZ</b></td>
+              <td><b>$45.03</b></td>
+              <td>8.0</td>
+              <td>64.1</td>
+              <td>$48.48</td>
+              <td>$42.17</td>
+              <td>✅</td>
+              <td style="color:#f57f17"><b>65/100</b></td></tr><tr>
+              <td><b>EQT</b></td>
+              <td><b>$56.76</b></td>
+              <td>11.8</td>
+              <td>59.6</td>
+              <td>$60.79</td>
+              <td>$55.79</td>
+              <td>✅</td>
+              <td style="color:#f57f17"><b>65/100</b></td></tr><tr>
+              <td><b>OXY</b></td>
+              <td><b>$55.83</b></td>
+              <td>32.7</td>
+              <td>70.0</td>
+              <td>$54.98</td>
+              <td>$45.96</td>
+              <td>✅</td>
+              <td style="color:#f57f17"><b>60/100</b></td></tr><tr>
+              <td><b>DVN</b></td>
+              <td><b>$45.23</b></td>
+              <td>26.9</td>
+              <td>68.9</td>
+              <td>$46.0</td>
+              <td>$37.34</td>
+              <td>✅</td>
+              <td style="color:#f57f17"><b>58/100</b></td></tr><tr>
+              <td><b>AKAM</b></td>
+              <td><b>$90.38</b></td>
+              <td>25.5</td>
+              <td>51.2</td>
+              <td>$104.36</td>
+              <td>$87.23</td>
+              <td>✅</td>
+              <td style="color:#f57f17"><b>58/100</b></td></tr><tr>
+              <td><b>SEDG</b></td>
+              <td><b>$37.83</b></td>
+              <td>26.3</td>
+              <td>55.0</td>
+              <td>$40.8</td>
+              <td>$34.49</td>
+              <td>✅</td>
+              <td style="color:#f57f17"><b>58/100</b></td></tr></tbody></table>
+
+  <div class="legend">
+    <p>🟢 <b>BULLISH</b> — Πάνω από MA50 &amp; MA200 &nbsp;|&nbsp; 🟢 <b>OVERSOLD/BUY ZONE</b> — RSI &lt;35 &amp; πάνω από MA200</p>
+    <p>🟡 <b>NEUTRAL</b> — Μικτά σήματα &nbsp;|&nbsp; 🔴 <b>BEARISH</b> — Κάτω από MA50 &amp; MA200 &nbsp;|&nbsp; 🔴 <b>OVERBOUGHT</b> — RSI &gt;70</p>
+    <p style="margin-top:6px">📊 <b>Swing Score 0–100</b>: RSI daily (35pts) + RSI weekly (25pts) + πάνω MA200 (20pts) + MA50 (10pts) + volume (10pts)</p>
+  </div>
+  <div class="footer">Παράχθηκε αυτόματα · Δεν αποτελεί επενδυτική συμβουλή · 16 April 2026, 08:02</div>
+</div></body></html>
